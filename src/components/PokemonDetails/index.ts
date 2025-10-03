@@ -1,0 +1,1 @@
+export { PokemonDetails } from './PokemonDetails';

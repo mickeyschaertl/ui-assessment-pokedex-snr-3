@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { createUseStyles } from 'react-jss';
+import { useNavigate } from 'react-router-dom';
 import { useGetPokemons } from '../../hooks/useGetPokemons';
 
 const getTypeColor = (type: string): string => {
@@ -28,6 +29,7 @@ const getTypeColor = (type: string): string => {
 
 export const PokemonList = () => {
   const classes = useStyles();
+  const navigate = useNavigate();
   const { pokemons, loading } = useGetPokemons();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -57,7 +59,11 @@ export const PokemonList = () => {
       {loading && <div>Loading...</div>}
       <div className={classes.grid}>
         {filteredPokemons.map((pkmn) => (
-          <div key={pkmn.id} className={classes.card}>
+          <div 
+            key={pkmn.id} 
+            className={classes.card}
+            onClick={() => navigate(`/pokemon/${pkmn.name.toLowerCase()}`)}
+          >
             <img 
               src={pkmn.image} 
               alt={pkmn.name}
