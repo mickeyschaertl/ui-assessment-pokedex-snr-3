@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useGetPokemons } from '../../hooks/useGetPokemons';
 
@@ -29,12 +29,34 @@ const getTypeColor = (type: string): string => {
 export const PokemonList = () => {
   const classes = useStyles();
   const { pokemons, loading } = useGetPokemons();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredPokemons = useMemo(() => {
+    if (!searchTerm.trim()) return pokemons;
+    
+    return pokemons.filter((pokemon) => 
+      pokemon.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pokemon.number.includes(searchTerm) ||
+      pokemon.types.some(type => 
+        type.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [pokemons, searchTerm]);
 
   return (
     <div className={classes.root}>
+      <div className={classes.searchContainer}>
+        <input
+          type="text"
+          placeholder="Search Pokémon by name, number, or type..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className={classes.searchInput}
+        />
+      </div>
       {loading && <div>Loading...</div>}
       <div className={classes.grid}>
-        {pokemons.map((pkmn) => (
+        {filteredPokemons.map((pkmn) => (
           <div key={pkmn.id} className={classes.card}>
             <img 
               src={pkmn.image} 
@@ -67,6 +89,32 @@ const useStyles = createUseStyles(
       width: '100%',
       padding: '32px',
       boxSizing: 'border-box',
+    },
+    searchContainer: {
+      maxWidth: '1200px',
+      margin: '0 auto 32px auto',
+      padding: '0 16px',
+      display: 'flex',
+      justifyContent: 'center',
+    },
+    searchInput: {
+      width: '100%',
+      maxWidth: '400px',
+      padding: '12px 16px',
+      fontSize: '16px',
+      border: '2px solid #e0e0e0',
+      borderRadius: '8px',
+      outline: 'none',
+      backgroundColor: '#fff',
+      color: '#333',
+      transition: 'border-color 0.2s ease-in-out',
+      '&:focus': {
+        borderColor: '#6890F0',
+        boxShadow: '0 0 0 3px rgba(104, 144, 240, 0.1)',
+      },
+      '&::placeholder': {
+        color: '#999',
+      },
     },
     grid: {
       display: 'grid',
